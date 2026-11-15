@@ -1,23 +1,45 @@
 extends Node2D
-## Тестовая комната 480x270: стены, игрок, один враг, HUD.
+## Тестовая комната 480x270: стены, игрок, враги, HUD.
+## Дебаг: клавиши 1-5 ставят оружие в активный слот, F заполняет шкалу альта.
 ## Позже заменится сгенерированными комнатами (systems/floor_generator).
 
 const ROOM_SIZE := Vector2(480, 270)
 const WALL := 16.0
+const WEAPON_PATHS: Array[String] = [
+	"res://data/weapons/holy_spear.tres",
+	"res://data/weapons/righteous_wand.tres",
+	"res://data/weapons/gold_plasma_crossbow.tres",
+	"res://data/weapons/gall_staff.tres",
+	"res://data/weapons/mirror_shard.tres",
+]
+
+var _player: Player
 
 
 func _ready() -> void:
 	_build_walls()
 	add_child(Hud.new())  # HUD раньше игрока, чтобы поймать его первые сигналы
 
-	var player := Player.new()
-	player.position = ROOM_SIZE / 2.0
-	player.weapons.append(load("res://data/weapons/holy_spear.tres") as WeaponData)
-	player.weapons.append(load("res://data/weapons/gold_plasma_crossbow.tres") as WeaponData)
-	add_child(player)
+	_player = Player.new()
+	_player.position = ROOM_SIZE / 2.0
+	_player.weapons.append(load(WEAPON_PATHS[0]) as WeaponData)
+	_player.weapons.append(load(WEAPON_PATHS[1]) as WeaponData)
+	add_child(_player)
 
 	_spawn_enemy()
+	_spawn_enemy()
 	EventBus.enemy_killed.connect(_on_enemy_killed)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	var key_event := event as InputEventKey
+	if key_event == null or not key_event.pressed or key_event.echo:
+		return
+	var index: int = key_event.physical_keycode - KEY_1
+	if index >= 0 and index < WEAPON_PATHS.size():
+		_player.equip(load(WEAPON_PATHS[index]) as WeaponData)
+	elif key_event.physical_keycode == KEY_F:
+		_player.add_alt_charge(Player.ALT_MAX)
 
 
 func _build_walls() -> void:
@@ -31,6 +53,7 @@ func _add_wall(center: Vector2, size: Vector2) -> void:
 	var body := StaticBody2D.new()
 	body.position = center
 	body.add_to_group("wall")
+	body.collision_layer = 3  # слой 1 (столкновения тел) + слой 2 (лучи пуль для рикошета)
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = size
@@ -42,7 +65,7 @@ func _add_wall(center: Vector2, size: Vector2) -> void:
 func _spawn_enemy() -> void:
 	var enemy := Enemy.new()
 	enemy.data = load("res://data/enemies/test_dummy.tres") as EnemyData
-	enemy.position = Vector2(ROOM_SIZE.x / 2.0, 70)
+	enemy.position = Vector2(randf_range(100.0, 380.0), 70.0)
 	add_child(enemy)
 
 

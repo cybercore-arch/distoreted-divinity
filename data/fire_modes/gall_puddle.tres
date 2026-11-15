@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="FireMode" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/fire_mode.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+kind = 2
+fire_rate = 0.4
+damage = 3
+color = Color(0.55, 0.75, 0.15, 1)
+zone_radius = 45.0
+zone_duration = 4.0
+zone_tick = 0.25
+zone_speed_mult = 1.4

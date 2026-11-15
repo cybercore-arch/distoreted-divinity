@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource("1")
-fire_rate = 3.0
-damage = 12
-projectile_speed = 220.0
-projectile_lifetime = 1.6
-projectile_radius = 5.0
-pellets = 1
-spread_degrees = 0.0
-color = Color(1, 0.75, 0.2, 1)
+kind = 1
+fire_rate = 2.2
+damage = 14
+color = Color(1, 0.95, 0.6, 1)
+melee_reach = 46.0
+melee_arc_degrees = 40.0
+melee_duration = 0.14
+speed_boost = 1.5
+speed_boost_duration = 1.0

@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource("1")
-fire_rate = 8.0
-damage = 4
-projectile_speed = 300.0
-projectile_lifetime = 1.0
+fire_rate = 5.0
+damage = 5
+color = Color(0.6, 0.7, 1, 1)
+projectile_speed = 240.0
+projectile_lifetime = 2.2
 projectile_radius = 3.0
 pellets = 1
-spread_degrees = 2.0
-color = Color(1, 0.92, 0.5, 1)
+spread_degrees = 4.0
+bounces = 3

@@ -26,8 +26,11 @@ func _ready() -> void:
 
 
 func take_damage(amount: int) -> void:
+	var dealt := mini(amount, health.current)
 	health.damage(amount)
 	_flash = 0.08
+	if dealt > 0:
+		EventBus.enemy_damaged.emit(dealt)
 
 
 func _physics_process(delta: float) -> void:
@@ -70,3 +73,7 @@ func _draw() -> void:
 		draw_texture(data.sprite, -data.sprite.get_size() / 2.0, tint)
 	else:
 		draw_circle(Vector2.ZERO, data.radius, data.color * tint)
+	var frac := float(health.current) / float(health.max_health)
+	var bar_y := -data.radius - 6.0
+	draw_rect(Rect2(-10.0, bar_y, 20.0, 2.0), Color(0, 0, 0, 0.6))
+	draw_rect(Rect2(-10.0, bar_y, 20.0 * frac, 2.0), Color(0.9, 0.3, 0.3))

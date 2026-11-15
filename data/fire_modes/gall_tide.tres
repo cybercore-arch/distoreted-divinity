@@ -4,11 +4,11 @@
 
 [resource]
 script = ExtResource("1")
-fire_rate = 0.8
-damage = 6
-projectile_speed = 160.0
-projectile_lifetime = 1.2
-projectile_radius = 4.0
-pellets = 16
-spread_degrees = 360.0
-color = Color(1, 0.6, 0.15, 1)
+kind = 2
+fire_rate = 1.0
+damage = 7
+color = Color(0.7, 0.85, 0.1, 1)
+zone_radius = 95.0
+zone_duration = 7.0
+zone_tick = 0.25
+zone_speed_mult = 1.5

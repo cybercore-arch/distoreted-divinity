@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FireMode" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/fire_mode.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+kind = 1
+fire_rate = 1.0
+damage = 40
+color = Color(1, 0.9, 0.45, 1)
+melee_reach = 64.0
+melee_arc_degrees = 360.0
+melee_duration = 0.25
+speed_boost = 1.5
+speed_boost_duration = 2.0

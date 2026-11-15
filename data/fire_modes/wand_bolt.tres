@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FireMode" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/fire_mode.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+fire_rate = 12.0
+damage = 1
+color = Color(0.7, 0.9, 1, 1)
+projectile_speed = 190.0
+projectile_lifetime = 2.0
+projectile_radius = 2.5
+pellets = 1
+spread_degrees = 14.0
+homing_degrees = 200.0
