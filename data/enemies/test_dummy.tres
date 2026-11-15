@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Тестовый Искажённый"
+color = Color(0.8, 0.2, 0.25, 1)
+radius = 8.0
+max_health = 60
+move_speed = 40.0
+keep_distance = 90.0
+fire_interval = 1.6
+bullet_count = 8
+bullet_speed = 90.0
+bullet_damage = 10
+bullet_color = Color(1, 0.35, 0.3, 1)
