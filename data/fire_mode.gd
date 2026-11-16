@@ -5,6 +5,7 @@ extends Resource
 
 enum Kind { PROJECTILE, MELEE, ZONE }
 enum MeleeStyle { THRUST, SWEEP }  ## THRUST — выпад вперёд, SWEEP — замах на 360° вокруг игрока
+enum ProjectileShape { ORB, ARROW }  ## внешний вид снаряда: круглая пуля или стрела
 
 @export var kind: Kind = Kind.PROJECTILE
 @export var fire_rate: float = 6.0  ## применений в секунду (для альта не важно)
@@ -15,6 +16,8 @@ enum MeleeStyle { THRUST, SWEEP }  ## THRUST — выпад вперёд, SWEEP 
 @export var projectile_speed: float = 260.0
 @export var projectile_lifetime: float = 1.2
 @export var projectile_radius: float = 3.0
+@export var projectile_shape: ProjectileShape = ProjectileShape.ORB
+@export var projectile_length: float = 24.0  ## длина стрелы (для ARROW)
 @export var pellets: int = 1  ## снарядов за выстрел
 @export var spread_degrees: float = 0.0  ## общий конус; 360 = равномерное кольцо
 

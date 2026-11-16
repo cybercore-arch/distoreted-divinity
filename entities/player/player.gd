@@ -174,6 +174,8 @@ func _fire_projectiles(mode: FireMode, dir: Vector2) -> void:
 		bullet.pierce = mode.pierce
 		bullet.bounces_left = mode.bounces
 		bullet.homing = mode.homing_degrees
+		bullet.visual = mode.projectile_shape
+		bullet.length = mode.projectile_length
 		get_tree().current_scene.add_child(bullet)
 
 

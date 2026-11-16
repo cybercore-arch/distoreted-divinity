@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+[ext_resource type="Resource" path="res://data/enemies/swarmling.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Выводок"
+color = Color(0.7, 0.6, 0.15, 1)
+radius = 10.0
+max_health = 70
+move_speed = 45.0
+behavior = 1
+contact_damage = 8
+contact_interval = 0.7
+split_into = ExtResource("2")
+split_count = 3

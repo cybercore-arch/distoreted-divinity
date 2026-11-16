@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Исступлённый"
+color = Color(1, 0.45, 0.15, 1)
+radius = 7.0
+max_health = 45
+move_speed = 85.0
+behavior = 1
+contact_damage = 12
+contact_interval = 0.7

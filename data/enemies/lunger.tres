@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+display_name = "Таран"
+color = Color(0.7, 0.2, 0.2, 1)
+radius = 9.0
+max_health = 80
+move_speed = 55.0
+behavior = 2
+contact_damage = 20
+contact_interval = 0.5
+fire_interval = 1.5
+lunge_range = 150.0
+lunge_windup = 0.6
+lunge_speed = 300.0
+lunge_duration = 0.45
+lunge_rest = 0.9

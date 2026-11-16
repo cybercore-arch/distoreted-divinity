@@ -21,7 +21,7 @@ func _ready() -> void:
 	_hint.position = Vector2(20, 240)
 	_hint.add_theme_font_size_override("font_size", 8)
 	_hint.modulate = Color(1, 1, 1, 0.6)
-	_hint.text = "дебаг: 1-5 оружие в активный слот · F заряд альта"
+	_hint.text = "дебаг: 1-5 оружие · Shift+1-6 враг · F заряд альта · C новая волна"
 	add_child(_hint)
 
 	EventBus.player_health_changed.connect(_on_health)
