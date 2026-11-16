@@ -4,6 +4,7 @@ extends Resource
 ## Тип (kind) решает, что делает режим: пули, ближний удар или зона вокруг игрока.
 
 enum Kind { PROJECTILE, MELEE, ZONE }
+enum MeleeStyle { THRUST, SWEEP }  ## THRUST — выпад вперёд, SWEEP — замах на 360° вокруг игрока
 
 @export var kind: Kind = Kind.PROJECTILE
 @export var fire_rate: float = 6.0  ## применений в секунду (для альта не важно)
@@ -23,9 +24,10 @@ enum Kind { PROJECTILE, MELEE, ZONE }
 @export var homing_degrees: float = 0.0  ## самонаведение, градусов в секунду
 
 @export_group("Ближний удар")
-@export var melee_reach: float = 40.0
-@export var melee_arc_degrees: float = 60.0  ## 350+ = круг вокруг игрока
-@export var melee_duration: float = 0.12
+@export var melee_style: MeleeStyle = MeleeStyle.THRUST
+@export var melee_reach: float = 56.0  ## длина копья от центра игрока
+@export var melee_width: float = 10.0  ## толщина зоны поражения выпада
+@export var melee_duration: float = 0.18  ## длительность всего удара
 
 @export_group("Ускорение игрока после применения")
 @export var speed_boost: float = 1.0  ## множитель скорости (ограничен в Player.MAX_SPEED_MULT)
