@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1")
+id = 4
 display_name = "Посох Горечи"
 rarity = 1
 tags = PackedStringArray("gall", "zone")

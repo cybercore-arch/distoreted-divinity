@@ -1,18 +1,16 @@
 class_name TestFloorBuilder
 extends RefCounted
-## Собирает тестовый этаж 0.0 из того, что лежит в data/ (контент подхватывается сам):
-##   вниз  — комнаты с оружием, по WEAPONS_PER_ROOM пьедесталов в каждой;
-##   вверх — по комнате на каждый тип врагов (ENEMY_COPIES штук за раз).
+## Собирает тестовый этаж 0.0 из реестра контента (ContentRegistry):
+##   вниз  — комнаты с оружием, по WEAPONS_PER_ROOM пьедесталов в каждой (в порядке номеров w.N);
+##   вверх — по комнате на каждый тип врагов (в порядке номеров e.N), ENEMY_COPIES штук за раз.
 ## Добавил новый .tres оружия или врага — он появится в комнатах без правок кода.
 
-const WEAPONS_DIR := "res://data/weapons"
-const ENEMIES_DIR := "res://data/enemies"
 const WEAPONS_PER_ROOM: int = 5
 const ENEMY_COPIES: int = 2
 
 
 static func build() -> FloorData:
-	var weapons := _load_weapons()
+	var weapons := ContentRegistry.weapons()
 	var weapon_rooms: Array[RoomData] = []  # от ближней к хабу к самой глубокой
 	var weapon_room_count := ceili(float(weapons.size()) / float(WEAPONS_PER_ROOM))
 	for r in weapon_room_count:
@@ -24,7 +22,9 @@ static func build() -> FloorData:
 		weapon_rooms.append(weapon_room)
 
 	var enemy_rooms: Array[RoomData] = []
-	for enemy in _load_enemies():
+	for enemy in ContentRegistry.enemies():
+		if not enemy.in_test_rooms:
+			continue
 		var enemy_room := RoomData.new()
 		enemy_room.kind = RoomData.Kind.ENEMIES
 		enemy_room.title = "Враги: %s" % enemy.display_name
@@ -45,32 +45,3 @@ static func build() -> FloorData:
 	result.rooms.append(hub)
 	result.rooms.append_array(enemy_rooms)
 	return result
-
-
-static func _load_weapons() -> Array[WeaponData]:
-	var result: Array[WeaponData] = []
-	for path in _resource_paths(WEAPONS_DIR):
-		var weapon := load(path) as WeaponData
-		if weapon != null:
-			result.append(weapon)
-	return result
-
-
-static func _load_enemies() -> Array[EnemyData]:
-	var result: Array[EnemyData] = []
-	for path in _resource_paths(ENEMIES_DIR):
-		var enemy := load(path) as EnemyData
-		if enemy != null and enemy.in_test_rooms:
-			result.append(enemy)
-	return result
-
-
-## Пути всех .tres в папке по алфавиту (в экспортированной игре к ним добавляется .remap).
-static func _resource_paths(dir: String) -> PackedStringArray:
-	var paths := PackedStringArray()
-	for file_name in DirAccess.get_files_at(dir):
-		var clean := file_name.trim_suffix(".remap")
-		if clean.ends_with(".tres"):
-			paths.append(dir.path_join(clean))
-	paths.sort()
-	return paths

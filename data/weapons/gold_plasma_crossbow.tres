@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1")
+id = 3
 display_name = "Золотой плазменный арбалет"
 rarity = 2
 tags = PackedStringArray("holy", "plasma", "citadel", "pierce")

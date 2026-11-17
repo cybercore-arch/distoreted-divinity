@@ -5,6 +5,7 @@
 
 [resource]
 script = ExtResource("1")
+id = 6
 display_name = "Выводок"
 color = Color(0.7, 0.6, 0.15, 1)
 radius = 10.0

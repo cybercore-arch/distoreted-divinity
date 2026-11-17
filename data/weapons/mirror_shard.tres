@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1")
+id = 5
 display_name = "Зеркальный раскол"
 rarity = 1
 tags = PackedStringArray("dusk", "ricochet")

@@ -4,6 +4,7 @@ extends CanvasLayer
 
 var _status: Label
 var _loadout: Label
+var _artifacts: Label
 var _room: Label
 var _hint: Label
 var _hp: String = ""
@@ -16,12 +17,14 @@ var _alt_fraction: float = 0.0
 func _ready() -> void:
 	_status = _make_label(Vector2(20, 18), 10, 1.0)
 	_loadout = _make_label(Vector2(20, 30), 10, 1.0)
+	_artifacts = _make_label(Vector2(20, 42), 8, 0.8)
 	_room = _make_label(Vector2(20, 234), 8, 0.8)
 	_hint = _make_label(Vector2(20, 245), 8, 0.6)
-	_hint.text = "дебаг: F заряд альта · C сброс врагов"
+	_hint.text = "консоль: ` (ё) · дебаг: F заряд альта · C сброс врагов"
 
 	EventBus.player_health_changed.connect(_on_health)
 	EventBus.loadout_changed.connect(_on_loadout)
+	EventBus.artifacts_changed.connect(_on_artifacts)
 	EventBus.dash_cooldown_changed.connect(_on_dash)
 	EventBus.alt_charge_changed.connect(_on_alt)
 	EventBus.room_changed.connect(func(title: String) -> void: _room.text = title)
@@ -54,6 +57,16 @@ func _on_loadout(weapons: Array, active_slot: int, limit: int) -> void:
 	if active_slot < weapons.size():
 		_alt_name = (weapons[active_slot] as WeaponData).alt_name
 	_refresh()
+
+
+func _on_artifacts(artifacts: Array) -> void:
+	if artifacts.is_empty():
+		_artifacts.text = ""
+		return
+	var names := PackedStringArray()
+	for artifact in artifacts:
+		names.append((artifact as ArtifactData).display_name)
+	_artifacts.text = "Артефакты: " + ", ".join(names)
 
 
 func _on_dash(remaining: float, _total: float) -> void:

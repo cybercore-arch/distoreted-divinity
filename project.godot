@@ -11,6 +11,9 @@ config/features=PackedStringArray("4.3")
 
 InputSetup="*res://core/input_setup.gd"
 EventBus="*res://core/event_bus.gd"
+ContentRegistry="*res://core/content_registry.gd"
+DebugState="*res://core/debug_state.gd"
+Console="*res://core/console/console.gd"
 
 [display]
 

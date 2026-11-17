@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource("1")
+id = 2
 display_name = "Жезл Праведника"
 rarity = 0
 tags = PackedStringArray("holy", "citadel", "homing")

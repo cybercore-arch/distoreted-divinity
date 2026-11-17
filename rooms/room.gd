@@ -29,6 +29,7 @@ func setup(p_data: RoomData, p_up_title: String, p_down_title: String, p_player:
 
 
 func _ready() -> void:
+	add_to_group("room")  # консоль и другие системы находят текущую комнату по группе
 	_build_walls()
 	_build_doors()
 	match data.kind:
@@ -110,12 +111,18 @@ func _build_pedestals() -> void:
 
 # --- Враги ------------------------------------------------------------------
 
+## Создаёт врага в случайной точке комнаты (используется и консолью: spawn e.N).
+func spawn_enemy(enemy_data: EnemyData) -> Enemy:
+	var enemy := Enemy.new()
+	enemy.data = enemy_data
+	enemy.position = _random_spawn_point()
+	add_child(enemy)
+	return enemy
+
+
 func _spawn_enemies() -> void:
 	for enemy_data in data.enemies:
-		var enemy := Enemy.new()
-		enemy.data = enemy_data
-		enemy.position = _random_spawn_point()
-		add_child(enemy)
+		spawn_enemy(enemy_data)
 
 
 func _random_spawn_point() -> Vector2:

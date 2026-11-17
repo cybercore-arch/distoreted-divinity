@@ -38,6 +38,8 @@ func _ready() -> void:
 
 
 func take_damage(amount: int) -> void:
+	if DebugState.onehit:
+		amount = health.current
 	var dealt := mini(amount, health.current)
 	health.damage(amount)
 	_flash = 0.08

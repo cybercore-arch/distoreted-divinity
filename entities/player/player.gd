@@ -2,7 +2,7 @@ class_name Player
 extends CharacterBody2D
 ## Игрок: WASD — движение, стрелки — стрельба, Q — смена оружия,
 ## E — альт (когда шкала заряда полная), пробел — рывок (неуязвимость + перезарядка).
-## Оружие берётся с пьедесталов через pick_up(), число слотов ограничено weapon_limit.
+## Оружие берётся с пьедесталов через pick_up(), число слотов ограничено get_weapon_limit().
 
 const ALT_MAX: float = 100.0
 const MAX_SPEED_MULT: float = 1.5  ## ускорения не складываются и не превышают это значение
@@ -13,13 +13,14 @@ const MAX_SPEED_MULT: float = 1.5  ## ускорения не складываю
 @export var dash_cooldown: float = 5.0
 @export var max_health: int = 100
 @export var hitbox_radius: float = 6.0
-@export var weapon_limit: int = 2  ## сколько оружия можно держать (артефакты позже будут повышать)
+@export var base_weapon_limit: int = 2  ## базовое число слотов оружия; артефакты прибавляют свои (get_weapon_limit)
 @export var sprite: Texture2D  ## сюда позже ляжет спрайт 32x32
 @export var weapons: Array[WeaponData] = []
 
 var health: Health
 var invulnerable: bool = false
 var alt_charge: float = 0.0
+var artifacts: Array[ArtifactData] = []
 
 var _slot: int = 0
 var _facing: Vector2 = Vector2.DOWN
@@ -46,7 +47,9 @@ func _ready() -> void:
 	health.setup(max_health)
 
 	EventBus.enemy_damaged.connect(_on_enemy_damaged)
+	DebugState.flag_changed.connect(_on_debug_flag)
 	EventBus.alt_charge_changed.emit(0.0)
+	EventBus.artifacts_changed.emit(artifacts)
 	_emit_loadout()
 
 
@@ -81,7 +84,7 @@ func _physics_process(delta: float) -> void:
 
 
 func take_damage(amount: int) -> void:
-	if invulnerable:
+	if invulnerable or DebugState.infhp:
 		return
 	health.damage(amount)
 
@@ -104,7 +107,7 @@ func add_alt_charge(amount: float) -> void:
 ## Слоты заняты — заменяет активное, а прежнее возвращает (пьедестал забирает его себе).
 func pick_up(weapon: WeaponData) -> WeaponData:
 	var leftover: WeaponData = null
-	if weapons.size() < weapon_limit:
+	if weapons.size() < get_weapon_limit():
 		weapons.append(weapon)
 		_slot = weapons.size() - 1
 	else:
@@ -121,8 +124,27 @@ func teleport(pos: Vector2) -> void:
 	velocity = Vector2.ZERO
 
 
+## Сколько оружия можно держать сейчас: база плюс бонусы артефактов.
+func get_weapon_limit() -> int:
+	var limit := base_weapon_limit
+	for artifact in artifacts:
+		limit += artifact.weapon_slots_bonus
+	return limit
+
+
+func add_artifact(artifact: ArtifactData) -> void:
+	artifacts.append(artifact)
+	EventBus.artifacts_changed.emit(artifacts)
+	_emit_loadout()  # лимит слотов мог измениться
+
+
+func _on_debug_flag(flag: String, on: bool) -> void:
+	if flag == "infalt" and on:
+		add_alt_charge(ALT_MAX)
+
+
 func _emit_loadout() -> void:
-	EventBus.loadout_changed.emit(weapons, _slot, weapon_limit)
+	EventBus.loadout_changed.emit(weapons, _slot, get_weapon_limit())
 
 
 func _on_enemy_damaged(amount: int) -> void:
@@ -135,7 +157,7 @@ func _on_enemy_damaged(amount: int) -> void:
 func _start_dash(move: Vector2) -> void:
 	_dash_dir = move.normalized() if move != Vector2.ZERO else _facing
 	_dash_left = dash_duration
-	_dash_cd_left = dash_cooldown
+	_dash_cd_left = 0.0 if DebugState.infdash else dash_cooldown
 	invulnerable = true
 
 
@@ -154,8 +176,9 @@ func _handle_weapons(move: Vector2) -> void:
 		_primary_cd = 1.0 / weapon.primary.fire_rate
 	if Input.is_action_just_pressed("alt_fire") and alt_charge >= ALT_MAX and weapon.alt != null:
 		_use(weapon.alt, _facing)
-		alt_charge = 0.0
-		EventBus.alt_charge_changed.emit(0.0)
+		if not DebugState.infalt:
+			alt_charge = 0.0
+			EventBus.alt_charge_changed.emit(0.0)
 
 
 func _use(mode: FireMode, dir: Vector2) -> void:

@@ -6,6 +6,7 @@ extends Resource
 
 enum Rarity { COMMON, UNCOMMON, RARE }
 
+@export var id: int = 0  ## номер для консоли: give w.N (задаётся вручную и не меняется)
 @export var display_name: String = "Оружие"
 @export var icon: Texture2D  ## позже: предмет 64x64
 @export var rarity: Rarity = Rarity.COMMON

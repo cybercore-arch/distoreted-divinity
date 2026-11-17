@@ -7,6 +7,7 @@ extends Resource
 enum Behavior { RANGED, CHARGE, LUNGE }
 enum Pattern { RING, AIMED, SPIRAL }
 
+@export var id: int = 0  ## номер для консоли: spawn e.N (задаётся вручную и не меняется)
 @export var display_name: String = "Враг"
 @export var sprite: Texture2D  ## позже: 32x32
 @export var color: Color = Color(0.8, 0.2, 0.25)  ## плейсхолдер, пока нет спрайта

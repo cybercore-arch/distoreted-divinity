@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+id = 4
 display_name = "Херувим-Прялка"
 color = Color(0.8, 0.4, 0.9, 1)
 radius = 9.0
