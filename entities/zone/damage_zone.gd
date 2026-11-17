@@ -24,6 +24,7 @@ func setup(pos: Vector2, mode: FireMode) -> void:
 
 
 func _ready() -> void:
+	add_to_group("transient")  # исчезает при смене комнаты
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = radius

@@ -4,7 +4,7 @@ config_version=5
 [application]
 
 config/name="Distorted Divinity"
-run/main_scene="res://scenes/test_room.tscn"
+run/main_scene="res://scenes/test_floor.tscn"
 config/features=PackedStringArray("4.3")
 
 [autoload]

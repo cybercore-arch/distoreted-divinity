@@ -13,6 +13,7 @@ enum Pattern { RING, AIMED, SPIRAL }
 @export var radius: float = 8.0
 @export var max_health: int = 30
 @export var move_speed: float = 40.0
+@export var in_test_rooms: bool = true  ## false — не получает своей комнаты на тестовом этаже (например, порождённые враги)
 @export var behavior: Behavior = Behavior.RANGED
 @export var contact_damage: int = 0  ## урон при касании игрока (0 = нет)
 @export var contact_interval: float = 0.7  ## пауза между касаниями

@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody2D
 ## Игрок: WASD — движение, стрелки — стрельба, Q — смена оружия,
 ## E — альт (когда шкала заряда полная), пробел — рывок (неуязвимость + перезарядка).
+## Оружие берётся с пьедесталов через pick_up(), число слотов ограничено weapon_limit.
 
 const ALT_MAX: float = 100.0
 const MAX_SPEED_MULT: float = 1.5  ## ускорения не складываются и не превышают это значение
@@ -12,6 +13,7 @@ const MAX_SPEED_MULT: float = 1.5  ## ускорения не складываю
 @export var dash_cooldown: float = 5.0
 @export var max_health: int = 100
 @export var hitbox_radius: float = 6.0
+@export var weapon_limit: int = 2  ## сколько оружия можно держать (артефакты позже будут повышать)
 @export var sprite: Texture2D  ## сюда позже ляжет спрайт 32x32
 @export var weapons: Array[WeaponData] = []
 
@@ -45,8 +47,7 @@ func _ready() -> void:
 
 	EventBus.enemy_damaged.connect(_on_enemy_damaged)
 	EventBus.alt_charge_changed.emit(0.0)
-	if not weapons.is_empty():
-		EventBus.weapon_changed.emit(weapons[_slot])
+	_emit_loadout()
 
 
 func _physics_process(delta: float) -> void:
@@ -74,7 +75,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("swap_weapon") and weapons.size() > 1:
 		_slot = (_slot + 1) % weapons.size()
 		_primary_cd = 0.0
-		EventBus.weapon_changed.emit(weapons[_slot])
+		_emit_loadout()
 	_handle_weapons(move)
 	queue_redraw()
 
@@ -99,14 +100,29 @@ func add_alt_charge(amount: float) -> void:
 	EventBus.alt_charge_changed.emit(alt_charge / ALT_MAX)
 
 
-## Подменяет оружие в активном слоте (нужно для дебага и подбора предметов).
-func equip(weapon: WeaponData) -> void:
-	if weapons.is_empty():
+## Подбор оружия. Есть свободный слот — оружие занимает его и становится активным (вернёт null).
+## Слоты заняты — заменяет активное, а прежнее возвращает (пьедестал забирает его себе).
+func pick_up(weapon: WeaponData) -> WeaponData:
+	var leftover: WeaponData = null
+	if weapons.size() < weapon_limit:
 		weapons.append(weapon)
+		_slot = weapons.size() - 1
 	else:
+		leftover = weapons[_slot]
 		weapons[_slot] = weapon
 	_primary_cd = 0.0
-	EventBus.weapon_changed.emit(weapon)
+	_emit_loadout()
+	return leftover
+
+
+## Мгновенно переставляет игрока (смена комнаты).
+func teleport(pos: Vector2) -> void:
+	global_position = pos
+	velocity = Vector2.ZERO
+
+
+func _emit_loadout() -> void:
+	EventBus.loadout_changed.emit(weapons, _slot, weapon_limit)
 
 
 func _on_enemy_damaged(amount: int) -> void:

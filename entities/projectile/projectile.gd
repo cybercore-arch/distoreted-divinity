@@ -37,6 +37,7 @@ func _is_arrow() -> bool:
 
 
 func _ready() -> void:
+	add_to_group("transient")  # исчезает при смене комнаты
 	var shape := CollisionShape2D.new()
 	if _is_arrow():
 		var rect := RectangleShape2D.new()
@@ -106,7 +107,7 @@ func _nearest_enemy() -> Node2D:
 
 
 func _on_body_entered(body: Node) -> void:
-	if body.is_in_group("wall") or body.is_in_group(team):
+	if body.is_in_group("wall") or body.is_in_group("low_obstacle") or body.is_in_group(team):
 		return
 	if _hit.has(body):
 		return

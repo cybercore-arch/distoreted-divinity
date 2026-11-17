@@ -36,6 +36,10 @@ func setup(p_follow: Node2D, dir: Vector2, mode: FireMode) -> void:
 	position = p_follow.global_position
 
 
+func _ready() -> void:
+	add_to_group("transient")  # исчезает при смене комнаты
+
+
 func _physics_process(delta: float) -> void:
 	_age += delta
 	if _age >= duration:
