@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://data/bullet_pattern.gd" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/aimed_fan.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -10,14 +12,6 @@ color = Color(0.55, 0.8, 1, 1)
 radius = 7.0
 max_health = 50
 move_speed = 40.0
-behavior = 0
-pattern = 1
-keep_distance = 170.0
 fire_interval = 2.6
-telegraph_time = 0.8
-bullet_count = 3
-fan_degrees = 14.0
-bullet_speed = 240.0
-bullet_damage = 14
-bullet_color = Color(0.7, 0.9, 1, 1)
-bullet_radius = 3.0
+attacks = Array[ExtResource("2")]([ExtResource("3")])
+keep_distance = 170.0

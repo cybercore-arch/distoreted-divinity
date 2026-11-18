@@ -10,12 +10,15 @@ const KIND_DIRS := {
 	"w": "res://data/weapons",
 	"a": "res://data/artifacts",
 	"e": "res://data/enemies",
+	"p": "res://data/patterns",
 }
-const KIND_NAMES := {"w": "оружие", "a": "артефакты", "e": "враги"}
-const KIND_ALIASES := {"w": "w", "weapon": "w", "a": "a", "artifact": "a", "e": "e", "enemy": "e"}
+const KIND_NAMES := {"w": "оружие", "a": "артефакты", "e": "враги", "p": "паттерны пуль"}
+const KIND_ALIASES := {
+	"w": "w", "weapon": "w", "a": "a", "artifact": "a", "e": "e", "enemy": "e", "p": "p", "pattern": "p",
+}
 const UNASSIGNED_ORDER: int = 1000000  ## ресурсы без номера идут в конец списка
 
-var _entries: Dictionary = {"w": [], "a": [], "e": []}  ## тип -> Array[Dictionary {id, stem, resource}]
+var _entries: Dictionary = {"w": [], "a": [], "e": [], "p": []}  ## тип -> Array[Dictionary {id, stem, resource}]
 
 
 func _ready() -> void:
@@ -55,7 +58,7 @@ func resolve(ref: String) -> Dictionary:
 		return {"error": "ссылка должна быть вида w.1 или w.имя_файла, а не «%s»" % ref}
 	var kind := normalize_kind(parts[0])
 	if kind == "":
-		return {"error": "неизвестный тип «%s» (w — оружие, a — артефакт, e — враг)" % parts[0]}
+		return {"error": "неизвестный тип «%s» (w — оружие, a — артефакт, e — враг, p — паттерн)" % parts[0]}
 	var key: String = parts[1]
 	for entry in _entries[kind]:
 		var id: int = entry["id"]
@@ -100,6 +103,8 @@ func _matches(kind: String, resource: Resource) -> bool:
 			return resource is ArtifactData
 		"e":
 			return resource is EnemyData
+		"p":
+			return resource is BulletPattern
 	return false
 
 

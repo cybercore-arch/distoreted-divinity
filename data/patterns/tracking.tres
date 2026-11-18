@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = 7
+display_name = "Слежение"
+windup = 0.4
+aim = 1
+bullets = 1
+shots = 8
+shot_interval = 0.15
+speed = 160.0
+lifetime = 4.0
+damage = 7
+color = Color(0.9, 0.9, 0.4, 1)

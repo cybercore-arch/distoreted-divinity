@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = 2
+display_name = "Прицельный веер"
+windup = 0.8
+aim = 0
+bullets = 3
+arc_degrees = 14.0
+shots = 1
+speed = 240.0
+lifetime = 4.0
+damage = 14
+color = Color(0.7, 0.9, 1, 1)

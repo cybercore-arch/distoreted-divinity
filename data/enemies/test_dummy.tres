@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://data/enemy_data.gd" id="1"]
+[ext_resource type="Script" path="res://data/bullet_pattern.gd" id="2"]
+[ext_resource type="Resource" path="res://data/patterns/ring.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -10,9 +12,6 @@ color = Color(0.8, 0.2, 0.25, 1)
 radius = 8.0
 max_health = 120
 move_speed = 40.0
-keep_distance = 90.0
 fire_interval = 2.5
-bullet_count = 6
-bullet_speed = 90.0
-bullet_damage = 10
-bullet_color = Color(1, 0.35, 0.3, 1)
+attacks = Array[ExtResource("2")]([ExtResource("3")])
+keep_distance = 90.0

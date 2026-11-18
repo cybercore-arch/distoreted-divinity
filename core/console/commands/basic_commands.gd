@@ -5,7 +5,7 @@ extends RefCounted
 
 func register() -> void:
 	Console.register(ConsoleCommand.create("help", PackedStringArray(["h", "?"]), "help [команда]", "список команд или справка по одной", _help))
-	Console.register(ConsoleCommand.create("list", PackedStringArray(["l", "ls"]), "list [w|a|e]", "номера оружия, артефактов и врагов", _list))
+	Console.register(ConsoleCommand.create("list", PackedStringArray(["l", "ls"]), "list [w|a|e|p]", "номера оружия, артефактов, врагов и паттернов пуль", _list))
 	Console.register(ConsoleCommand.create("clear", PackedStringArray(["cls"]), "clear", "очистить консоль", _clear))
 
 
@@ -14,7 +14,7 @@ func _help(args: PackedStringArray) -> void:
 		Console.say("Команды (help <команда> — подробнее):", "88ccff")
 		for command in Console.commands():
 			Console.say("  %s — %s" % [command.usage, command.help])
-		Console.say("Ссылки: w.N оружие · a.N артефакт · e.N враг (номера: list). Также по имени файла: w.holy_spear", "aaaaaa")
+		Console.say("Ссылки: w.N оружие · a.N артефакт · e.N враг · p.N паттерн пуль (номера: list). Также по имени файла: w.holy_spear", "aaaaaa")
 		return
 	var command := Console.find_command(args[0].to_lower())
 	if command == null:
@@ -31,7 +31,7 @@ func _list(args: PackedStringArray) -> void:
 	if not args.is_empty():
 		var kind := ContentRegistry.normalize_kind(args[0])
 		if kind == "":
-			Console.error("неизвестный тип «%s» (w, a, e)" % args[0])
+			Console.error("неизвестный тип «%s» (w, a, e, p)" % args[0])
 			return
 		kinds = [kind]
 	for kind in kinds:

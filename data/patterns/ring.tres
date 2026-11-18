@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = 1
+display_name = "Кольцо"
+aim = 2
+bullets = 6
+arc_degrees = 360.0
+shots = 1
+rotate_per_use_degrees = 17.0
+speed = 90.0
+lifetime = 4.0
+damage = 10
+color = Color(1, 0.35, 0.3, 1)

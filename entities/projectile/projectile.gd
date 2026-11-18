@@ -16,6 +16,8 @@ var lifetime: float = 1.0
 var pierce: int = 0  ## -1 = бесконечно
 var bounces_left: int = 0
 var homing: float = 0.0  ## градусов в секунду
+var accel: float = 0.0  ## изменение скорости в секунду
+var turn: float = 0.0  ## изгиб траектории, градусов в секунду
 var visual: FireMode.ProjectileShape = FireMode.ProjectileShape.ORB
 var length: float = 24.0  ## длина стрелы
 
@@ -60,6 +62,10 @@ func _physics_process(delta: float) -> void:
 
 	if homing > 0.0:
 		_steer(delta)
+	if accel != 0.0 and velocity != Vector2.ZERO:
+		velocity = velocity.normalized() * maxf(0.0, velocity.length() + accel * delta)
+	if turn != 0.0:
+		velocity = velocity.rotated(deg_to_rad(turn) * delta)
 
 	var from := global_position
 	var to := from + velocity * delta

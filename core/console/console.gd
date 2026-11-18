@@ -13,6 +13,7 @@ const PROVIDER_PATHS: Array[String] = [
 	"res://core/console/commands/basic_commands.gd",
 	"res://core/console/commands/give_commands.gd",
 	"res://core/console/commands/spawn_commands.gd",
+	"res://core/console/commands/pattern_commands.gd",
 	"res://core/console/commands/debug_commands.gd",
 ]
 

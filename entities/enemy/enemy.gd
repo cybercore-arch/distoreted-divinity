@@ -1,7 +1,7 @@
 class_name Enemy
 extends CharacterBody2D
 ## Враг, целиком описанный EnemyData. Поведение выбирается полем behavior:
-## RANGED (паттерны пуль), CHARGE (бежит напролом), LUNGE (рывок с предупреждением).
+## RANGED (атаки паттернами пуль), CHARGE (бежит напролом), LUNGE (рывок с предупреждением).
 
 enum State { MOVE, WINDUP, BURST, LUNGING, REST }
 
@@ -15,9 +15,9 @@ var _cooldown: float = 1.0
 var _contact_cd: float = 0.0
 var _flash: float = 0.0
 var _aim: Vector2 = Vector2.DOWN
-var _burst_left: int = 0
-var _shot_left: float = 0.0
-var _angle: float = 0.0  ## вращение колец и спиралей
+var _attack: BulletPattern  ## текущая атака (RANGED)
+var _attack_index: int = 0
+var _runner: PatternRunner
 var _player: Node2D
 
 
@@ -33,6 +33,12 @@ func _ready() -> void:
 	add_child(health)
 	health.setup(data.max_health)
 	health.died.connect(_on_died)
+
+	if data.behavior == EnemyData.Behavior.RANGED:
+		_runner = PatternRunner.new()
+		_runner.team = "enemy"
+		_runner.finished.connect(_on_attack_finished)
+		add_child(_runner)
 
 	_cooldown = randf_range(0.4, maxf(0.5, data.fire_interval))
 
@@ -82,57 +88,41 @@ func _tick_ranged(delta: float, to_player: Vector2) -> void:
 				velocity = Vector2.ZERO
 			_cooldown -= delta
 			if _cooldown <= 0.0:
-				_aim = to_player.normalized()
-				if data.telegraph_time > 0.0:
-					_state = State.WINDUP
-					_state_time = data.telegraph_time
-				else:
-					_start_burst()
+				_begin_attack(to_player)
 		State.WINDUP:
 			velocity = Vector2.ZERO
 			_state_time -= delta
 			if _state_time <= 0.0:
-				_start_burst()
+				_fire_attack()
 		State.BURST:
-			velocity = Vector2.ZERO
-			_shot_left -= delta
-			if _shot_left <= 0.0:
-				_fire_shot()
-				_burst_left -= 1
-				_shot_left = data.shot_interval
-				if _burst_left <= 0:
-					_state = State.MOVE
-					_cooldown = data.fire_interval
+			velocity = Vector2.ZERO  # серию ведёт PatternRunner, по её окончании придёт _on_attack_finished
 
 
-func _start_burst() -> void:
+func _begin_attack(to_player: Vector2) -> void:
+	if data.attacks.is_empty():
+		_cooldown = data.fire_interval
+		return
+	if data.attack_order == EnemyData.AttackOrder.RANDOM:
+		_attack = data.attacks.pick_random()
+	else:
+		_attack = data.attacks[_attack_index % data.attacks.size()]
+		_attack_index += 1
+	_aim = to_player.normalized()
+	if _attack.windup > 0.0:
+		_state = State.WINDUP
+		_state_time = _attack.windup
+	else:
+		_fire_attack()
+
+
+func _fire_attack() -> void:
 	_state = State.BURST
-	_burst_left = maxi(1, data.burst_shots)
-	_shot_left = 0.0
+	_runner.start(_attack, _aim)
 
 
-func _fire_shot() -> void:
-	match data.pattern:
-		EnemyData.Pattern.RING:
-			_angle += 0.3
-			for i in data.bullet_count:
-				_spawn_bullet(Vector2.from_angle(_angle + TAU * float(i) / float(data.bullet_count)))
-		EnemyData.Pattern.AIMED:
-			for i in data.bullet_count:
-				var offset := 0.0
-				if data.bullet_count > 1:
-					offset = lerpf(-data.fan_degrees * 0.5, data.fan_degrees * 0.5, float(i) / float(data.bullet_count - 1))
-				_spawn_bullet(_aim.rotated(deg_to_rad(offset)))
-		EnemyData.Pattern.SPIRAL:
-			for i in data.bullet_count:
-				_spawn_bullet(Vector2.from_angle(_angle + TAU * float(i) / float(data.bullet_count)))
-			_angle += data.spiral_turn
-
-
-func _spawn_bullet(dir: Vector2) -> void:
-	var bullet := Projectile.new()
-	bullet.setup(global_position, dir * data.bullet_speed, data.bullet_damage, "enemy", data.bullet_color, data.bullet_lifetime, data.bullet_radius)
-	get_tree().current_scene.add_child(bullet)
+func _on_attack_finished() -> void:
+	_state = State.MOVE
+	_cooldown = data.fire_interval
 
 
 # --- LUNGE ------------------------------------------------------------------
@@ -206,11 +196,20 @@ func _draw() -> void:
 	draw_rect(Rect2(-10.0, bar_y, 20.0 * frac, 2.0), Color(0.9, 0.3, 0.3))
 
 
-## Линия предупреждения: тоньше и бледнее в начале, ярче к моменту удара.
+## Предупреждение: линия в сторону удара (прицельные атаки и рывок) или расходящееся кольцо.
+## Тоньше и бледнее в начале, ярче к моменту атаки.
 func _draw_telegraph() -> void:
-	var is_lunge := data.behavior == EnemyData.Behavior.LUNGE
-	var total := data.lunge_windup if is_lunge else data.telegraph_time
-	var progress := 1.0 - _state_time / maxf(total, 0.01)
-	var length := data.lunge_speed * data.lunge_duration if is_lunge else 240.0
-	var c := data.color if is_lunge else data.bullet_color
-	draw_line(Vector2.ZERO, _aim * length, Color(c.r, c.g, c.b, 0.2 + 0.6 * progress), 1.0 + 2.0 * progress)
+	if data.behavior == EnemyData.Behavior.LUNGE:
+		var progress := 1.0 - _state_time / maxf(data.lunge_windup, 0.01)
+		var c := data.color
+		var length := data.lunge_speed * data.lunge_duration
+		draw_line(Vector2.ZERO, _aim * length, Color(c.r, c.g, c.b, 0.2 + 0.6 * progress), 1.0 + 2.0 * progress)
+		return
+	if _attack == null:
+		return
+	var windup_progress := 1.0 - _state_time / maxf(_attack.windup, 0.01)
+	var color := Color(_attack.color.r, _attack.color.g, _attack.color.b, 0.2 + 0.6 * windup_progress)
+	if _attack.aim == BulletPattern.Aim.FIXED:
+		draw_arc(Vector2.ZERO, data.radius + 3.0 + 10.0 * windup_progress, 0.0, TAU, 24, color, 1.5)
+	else:
+		draw_line(Vector2.ZERO, _aim * 240.0, color, 1.0 + 2.0 * windup_progress)

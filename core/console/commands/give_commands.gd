@@ -34,3 +34,5 @@ func _give(args: PackedStringArray) -> void:
 				Console.ok("артефакт: %s" % artifact.display_name)
 			"e":
 				Console.error("врагов не выдают, используй: spawn %s" % ref)
+			"p":
+				Console.error("паттерны не выдают, используй: fire %s" % ref)

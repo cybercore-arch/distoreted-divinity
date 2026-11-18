@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BulletPattern" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/bullet_pattern.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = 5
+display_name = "Завихрение"
+aim = 2
+bullets = 6
+arc_degrees = 360.0
+shots = 6
+shot_interval = 0.25
+rotate_per_shot_degrees = 10.0
+speed = 70.0
+turn_degrees_per_second = 40.0
+lifetime = 5.0
+damage = 8
+color = Color(0.6, 0.8, 1, 1)

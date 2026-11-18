@@ -1,11 +1,11 @@
 class_name EnemyData
 extends Resource
 ## Данные врага. Новый враг = новый .tres, а не новый код.
-## behavior: RANGED — держит дистанцию и стреляет паттерном, CHARGE — бежит напролом,
+## behavior: RANGED — держит дистанцию и атакует паттернами пуль, CHARGE — бежит напролом,
 ## LUNGE — подходит, замирает с предупреждением и делает рывок.
 
 enum Behavior { RANGED, CHARGE, LUNGE }
-enum Pattern { RING, AIMED, SPIRAL }
+enum AttackOrder { SEQUENCE, RANDOM }  ## по очереди или случайно
 
 @export var id: int = 0  ## номер для консоли: spawn e.N (задаётся вручную и не меняется)
 @export var display_name: String = "Враг"
@@ -18,22 +18,12 @@ enum Pattern { RING, AIMED, SPIRAL }
 @export var behavior: Behavior = Behavior.RANGED
 @export var contact_damage: int = 0  ## урон при касании игрока (0 = нет)
 @export var contact_interval: float = 0.7  ## пауза между касаниями
-
-@export_group("Стрельба (RANGED)")
-@export var pattern: Pattern = Pattern.RING
-@export var keep_distance: float = 90.0  ## ближе 70% этого значения враг отступает
 @export var fire_interval: float = 1.6  ## пауза между атаками (для LUNGE — между рывками)
-@export var telegraph_time: float = 0.0  ## предупреждение перед выстрелом (0 = без)
-@export var burst_shots: int = 1  ## выстрелов за серию
-@export var shot_interval: float = 0.1  ## пауза между выстрелами серии
-@export var bullet_count: int = 8  ## пуль за выстрел (для SPIRAL — число лучей)
-@export var fan_degrees: float = 0.0  ## веер для AIMED
-@export var spiral_turn: float = 0.3  ## поворот спирали за выстрел, радиан
-@export var bullet_speed: float = 90.0
-@export var bullet_damage: int = 10
-@export var bullet_color: Color = Color(1.0, 0.35, 0.3)
-@export var bullet_radius: float = 3.0
-@export var bullet_lifetime: float = 4.0
+
+@export_group("Атаки (RANGED)")
+@export var attacks: Array[BulletPattern] = []  ## паттерны пуль; можно несколько
+@export var attack_order: AttackOrder = AttackOrder.SEQUENCE
+@export var keep_distance: float = 90.0  ## ближе 70% этого значения враг отступает
 
 @export_group("Рывок (LUNGE)")
 @export var lunge_range: float = 150.0  ## с какого расстояния начинает рывок
