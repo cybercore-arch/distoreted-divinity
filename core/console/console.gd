@@ -21,7 +21,7 @@ var _ordered: Array[ConsoleCommand] = []  ## команды в порядке р
 var _providers: Array[RefCounted] = []
 var _panel: PanelContainer
 var _log: RichTextLabel
-var _input: LineEdit
+var _line: LineEdit
 var _history: Array[String] = []
 var _history_pos: int = 0
 
@@ -112,12 +112,12 @@ func _build_ui() -> void:
 	_log.add_theme_font_size_override("normal_font_size", 8)
 	box.add_child(_log)
 
-	_input = LineEdit.new()
-	_input.placeholder_text = "команда…  (help)"
-	_input.add_theme_font_size_override("font_size", 9)
-	_input.text_submitted.connect(_on_submit)
-	_input.gui_input.connect(_on_input_gui)
-	box.add_child(_input)
+	_line = LineEdit.new()
+	_line.placeholder_text = "команда…  (help)"
+	_line.add_theme_font_size_override("font_size", 9)
+	_line.text_submitted.connect(_on_submit)
+	_line.gui_input.connect(_on_input_gui)
+	box.add_child(_line)
 
 	_panel.add_child(box)
 	add_child(_panel)
@@ -129,10 +129,10 @@ func _set_open(open: bool) -> void:
 	_panel.visible = open
 	get_tree().paused = open
 	if open:
-		_input.clear()
-		_input.grab_focus()
+		_line.clear()
+		_line.grab_focus()
 	else:
-		_input.release_focus()
+		_line.release_focus()
 
 
 func _input(event: InputEvent) -> void:
@@ -149,7 +149,7 @@ func _input(event: InputEvent) -> void:
 
 func _on_submit(text: String) -> void:
 	var line := text.strip_edges()
-	_input.clear()
+	_line.clear()
 	if line == "":
 		return
 	_history.append(line)
@@ -166,26 +166,26 @@ func _on_input_gui(event: InputEvent) -> void:
 	match key.keycode:
 		KEY_UP:
 			_step_history(-1)
-			_input.accept_event()
+			_line.accept_event()
 		KEY_DOWN:
 			_step_history(1)
-			_input.accept_event()
+			_line.accept_event()
 		KEY_TAB:
 			_complete()
-			_input.accept_event()
+			_line.accept_event()
 
 
 func _step_history(step: int) -> void:
 	if _history.is_empty():
 		return
 	_history_pos = clampi(_history_pos + step, 0, _history.size())
-	_input.text = "" if _history_pos >= _history.size() else _history[_history_pos]
-	_input.caret_column = _input.text.length()
+	_line.text = "" if _history_pos >= _history.size() else _history[_history_pos]
+	_line.caret_column = _line.text.length()
 
 
 ## Tab: дополняет имя команды (если подходит ровно одна), иначе показывает варианты.
 func _complete() -> void:
-	var typed := _input.text.strip_edges(true, false).to_lower()
+	var typed := _line.text.strip_edges(true, false).to_lower()
 	if typed == "" or typed.contains(" "):
 		return
 	var matches := PackedStringArray()
@@ -193,7 +193,7 @@ func _complete() -> void:
 		if command.name.begins_with(typed):
 			matches.append(command.name)
 	if matches.size() == 1:
-		_input.text = matches[0] + " "
-		_input.caret_column = _input.text.length()
+		_line.text = matches[0] + " "
+		_line.caret_column = _line.text.length()
 	elif matches.size() > 1:
 		say("  ".join(matches), "aaaaaa")

@@ -29,5 +29,5 @@ func _on_body_entered(body: Node) -> void:
 
 func _draw() -> void:
 	draw_rect(Rect2(-SIZE * 0.5, SIZE), Color(0.9, 0.75, 0.3, 0.55))
-	var label_y := 22.0 if direction == Direction.UP else -12.0
+	var label_y := 34.0 if direction == Direction.UP else -12.0  # верхняя надпись ниже строк HUD
 	draw_string(ThemeDB.fallback_font, Vector2(-70.0, label_y), title, HORIZONTAL_ALIGNMENT_CENTER, 140.0, 8, Color(1, 1, 1, 0.7))

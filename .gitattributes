@@ -1,0 +1,16 @@
+# Единые переводы строк (LF) для всех текстовых файлов, чтобы Git на Windows
+# не считал их изменёнными после открытия проекта в Godot.
+* text=auto eol=lf
+
+# Бинарные файлы не трогаем.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ogg binary
+*.wav binary
+*.mp3 binary
+*.ttf binary
+*.otf binary
+*.aseprite binary
+*.psd binary
