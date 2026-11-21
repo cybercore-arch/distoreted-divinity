@@ -1,26 +1,32 @@
 class_name FloorData
 extends Resource
-## Этаж как вертикальная цепочка комнат (снизу вверх). Дверь вверх ведёт в rooms[i + 1],
-## дверь вниз — в rooms[i - 1]. Позже здесь же будет сетка комнат в стиле Isaac.
+## Этаж как сетка комнат: клетка (Vector2i) -> RoomData. Дверь ведёт в соседнюю клетку,
+## если там есть комната; вверх это y − 1. Тестовый этаж: хаб в (0,0), оружие вниз, враги вверх, артефакты вправо.
+## Позже здесь же будет генерируемая сетка в стиле Isaac.
 
 @export var title: String = "0.0"
-@export var rooms: Array[RoomData] = []
-@export var hub_index: int = 0  ## комната, в которой начинается этаж
+@export var start: Vector2i = Vector2i.ZERO  ## клетка, в которой начинается этаж
+
+var cells: Dictionary = {}  ## Vector2i -> RoomData
 
 
-func has_up(index: int) -> bool:
-	return index + 1 < rooms.size()
+func set_room(cell: Vector2i, room: RoomData) -> void:
+	cells[cell] = room
 
 
-func has_down(index: int) -> bool:
-	return index > 0
+func has_room(cell: Vector2i) -> bool:
+	return cells.has(cell)
 
 
-## Название комнаты за дверью вверх ("" — двери нет).
-func title_above(index: int) -> String:
-	return rooms[index + 1].title if has_up(index) else ""
+func room_at(cell: Vector2i) -> RoomData:
+	return cells.get(cell)
 
 
-## Название комнаты за дверью вниз ("" — двери нет).
-func title_below(index: int) -> String:
-	return rooms[index - 1].title if has_down(index) else ""
+## Названия комнат за дверями: {Door.Direction: название}. Направления без комнаты в словарь не попадают.
+func neighbor_titles(cell: Vector2i) -> Dictionary:
+	var result := {}
+	for direction in [Door.Direction.UP, Door.Direction.DOWN, Door.Direction.LEFT, Door.Direction.RIGHT]:
+		var neighbor: RoomData = cells.get(cell + Door.offset(direction))
+		if neighbor != null:
+			result[direction] = neighbor.title
+	return result

@@ -5,6 +5,7 @@ extends CanvasLayer
 var _status: Label
 var _loadout: Label
 var _artifacts: Label
+var _stats: RichTextLabel
 var _room: Label
 var _hint: Label
 var _hp: String = ""
@@ -18,6 +19,17 @@ func _ready() -> void:
 	_status = _make_label(Vector2(20, 18), 10, 1.0)
 	_loadout = _make_label(Vector2(20, 30), 10, 1.0)
 	_artifacts = _make_label(Vector2(20, 42), 8, 0.8)
+	_artifacts.size = Vector2(440, 10)
+	_artifacts.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_stats = RichTextLabel.new()
+	_stats.position = Vector2(20, 58)
+	_stats.size = Vector2(120, 80)
+	_stats.bbcode_enabled = true
+	_stats.scroll_active = false
+	_stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stats.add_theme_font_size_override("normal_font_size", 8)
+	_stats.add_theme_constant_override("line_separation", 0)
+	add_child(_stats)
 	_room = _make_label(Vector2(20, 234), 8, 0.8)
 	_hint = _make_label(Vector2(20, 245), 8, 0.6)
 	_hint.text = "консоль: ` (ё) · дебаг: F заряд альта · C сброс врагов"
@@ -25,6 +37,7 @@ func _ready() -> void:
 	EventBus.player_health_changed.connect(_on_health)
 	EventBus.loadout_changed.connect(_on_loadout)
 	EventBus.artifacts_changed.connect(_on_artifacts)
+	EventBus.stats_changed.connect(_on_stats)
 	EventBus.dash_cooldown_changed.connect(_on_dash)
 	EventBus.alt_charge_changed.connect(_on_alt)
 	EventBus.room_changed.connect(func(title: String) -> void: _room.text = title)
@@ -66,11 +79,28 @@ func _on_artifacts(artifacts: Array) -> void:
 	var names := PackedStringArray()
 	for artifact in artifacts:
 		names.append((artifact as ArtifactData).display_name)
-	_artifacts.text = "Артефакты: " + ", ".join(names)
+	_artifacts.text = "Артефакты (%d): %s" % [names.size(), ", ".join(names)]
 
 
-func _on_dash(remaining: float, _total: float) -> void:
+## Боковая панель характеристик, как в Isaac: зелёным то, что лучше базы, красным — хуже.
+func _on_stats(lines: Array) -> void:
+	var text := ""
+	for line in lines:
+		var color := "bbbbbb"
+		if line["trend"] > 0:
+			color = "7fe08a"
+		elif line["trend"] < 0:
+			color = "e07f7f"
+		text += "[color=#999999]%s[/color] [color=#%s]%s[/color]\n" % [line["name"], color, line["text"]]
+	_stats.text = text
+
+
+func _on_dash(remaining: float, _total: float, charges: int) -> void:
 	var text := "Рывок: готов" if remaining <= 0.0 else "Рывок: %.1f" % remaining
+	if charges > 1 and remaining <= 0.0:
+		text = "Рывок: готов ×%d" % charges
+	elif charges > 0 and remaining > 0.0:
+		text = "Рывок: ещё %d (%.1f)" % [charges, remaining]
 	if text != _dash:
 		_dash = text
 		_refresh()

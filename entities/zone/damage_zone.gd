@@ -6,6 +6,7 @@ var radius: float = 45.0
 var duration: float = 4.0
 var tick: float = 0.25
 var tick_damage: int = 1
+var damage_mult: float = 1.0  ## множитель урона игрока; дробь округляется случайно (PlayerStats.roll) на каждом тике
 var speed_mult: float = 1.0
 var color: Color = Color(0.55, 0.75, 0.15)
 
@@ -49,7 +50,7 @@ func _physics_process(delta: float) -> void:
 		_tick_left = tick
 		for body in bodies:
 			if body is Enemy:
-				(body as Enemy).take_damage(tick_damage)
+				(body as Enemy).take_damage(maxi(1, PlayerStats.roll(float(tick_damage) * damage_mult)))
 	queue_redraw()
 
 

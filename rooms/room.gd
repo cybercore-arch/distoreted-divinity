@@ -14,17 +14,15 @@ const ENEMY_MIN_DISTANCE: float = 120.0  ## враги не появляются
 const RESPAWN_DELAY: float = 1.5
 
 var data: RoomData
-var up_title: String = ""  ## "" — двери вверх нет
-var down_title: String = ""
+var door_titles: Dictionary = {}  ## {Door.Direction: название комнаты за дверью}; нет ключа — нет двери
 
 var _player: Player
 var _wave_pending: bool = false
 
 
-func setup(p_data: RoomData, p_up_title: String, p_down_title: String, p_player: Player) -> void:
+func setup(p_data: RoomData, p_door_titles: Dictionary, p_player: Player) -> void:
 	data = p_data
-	up_title = p_up_title
-	down_title = p_down_title
+	door_titles = p_door_titles
 	_player = p_player
 
 
@@ -34,7 +32,9 @@ func _ready() -> void:
 	_build_doors()
 	match data.kind:
 		RoomData.Kind.WEAPONS:
-			_build_pedestals()
+			_build_weapon_pedestals()
+		RoomData.Kind.ARTIFACTS:
+			_build_artifact_pedestals()
 		RoomData.Kind.ENEMIES:
 			EventBus.enemy_killed.connect(_on_enemy_killed)
 
@@ -45,13 +45,18 @@ func begin() -> void:
 		_spawn_enemies()
 
 
-## Где появится игрок. moved — в какую сторону он шёл: вошёл вверх — оказывается внизу, и наоборот.
+## Где появится игрок. moved — в какую сторону он шёл: вошёл вверх — оказывается у нижней двери, и т. д.
 ## Любое другое значение (старт этажа) — центр комнаты.
 func spawn_position(moved: int) -> Vector2:
-	if moved == Door.Direction.UP:
-		return Vector2(SIZE.x * 0.5, SIZE.y - WALL - Door.SIZE.y - SPAWN_MARGIN)
-	if moved == Door.Direction.DOWN:
-		return Vector2(SIZE.x * 0.5, WALL + Door.SIZE.y + SPAWN_MARGIN)
+	match moved:
+		Door.Direction.UP:
+			return Vector2(SIZE.x * 0.5, SIZE.y - WALL - Door.SIZE.y - SPAWN_MARGIN)
+		Door.Direction.DOWN:
+			return Vector2(SIZE.x * 0.5, WALL + Door.SIZE.y + SPAWN_MARGIN)
+		Door.Direction.RIGHT:
+			return Vector2(WALL + Door.SIZE.y + SPAWN_MARGIN, SIZE.y * 0.5)
+		Door.Direction.LEFT:
+			return Vector2(SIZE.x - WALL - Door.SIZE.y - SPAWN_MARGIN, SIZE.y * 0.5)
 	return SIZE * 0.5
 
 
@@ -85,10 +90,15 @@ func _add_wall(center: Vector2, size: Vector2) -> void:
 
 
 func _build_doors() -> void:
-	if up_title != "":
-		_add_door(Door.Direction.UP, Vector2(SIZE.x * 0.5, WALL + Door.SIZE.y * 0.5), up_title)
-	if down_title != "":
-		_add_door(Door.Direction.DOWN, Vector2(SIZE.x * 0.5, SIZE.y - WALL - Door.SIZE.y * 0.5), down_title)
+	var positions := {
+		Door.Direction.UP: Vector2(SIZE.x * 0.5, WALL + Door.SIZE.y * 0.5),
+		Door.Direction.DOWN: Vector2(SIZE.x * 0.5, SIZE.y - WALL - Door.SIZE.y * 0.5),
+		Door.Direction.LEFT: Vector2(WALL + Door.SIZE.y * 0.5, SIZE.y * 0.5),
+		Door.Direction.RIGHT: Vector2(SIZE.x - WALL - Door.SIZE.y * 0.5, SIZE.y * 0.5),
+	}
+	for direction in positions:
+		if door_titles.has(direction):
+			_add_door(direction, positions[direction], door_titles[direction])
 
 
 func _add_door(direction: Door.Direction, pos: Vector2, title: String) -> void:
@@ -100,13 +110,24 @@ func _add_door(direction: Door.Direction, pos: Vector2, title: String) -> void:
 	add_child(door)
 
 
-func _build_pedestals() -> void:
-	var count := data.weapons.size()
-	for i in count:
+func _build_weapon_pedestals() -> void:
+	for i in data.weapons.size():
 		var pedestal := WeaponPedestal.new()
 		pedestal.weapon = data.weapons[i]
-		pedestal.position = Vector2(SIZE.x * 0.5 + (float(i) - float(count - 1) * 0.5) * PEDESTAL_SPACING, SIZE.y * 0.5)
-		add_child(pedestal)
+		_place_pedestal(pedestal, i, data.weapons.size())
+
+
+func _build_artifact_pedestals() -> void:
+	for i in data.artifacts.size():
+		var pedestal := ArtifactPedestal.new()
+		pedestal.artifact = data.artifacts[i]
+		_place_pedestal(pedestal, i, data.artifacts.size())
+
+
+## Пьедесталы стоят рядом по центру комнаты.
+func _place_pedestal(pedestal: Pedestal, index: int, count: int) -> void:
+	pedestal.position = Vector2(SIZE.x * 0.5 + (float(index) - float(count - 1) * 0.5) * PEDESTAL_SPACING, SIZE.y * 0.5)
+	add_child(pedestal)
 
 
 # --- Враги ------------------------------------------------------------------

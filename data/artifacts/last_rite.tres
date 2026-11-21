@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ArtifactData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/artifact_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = 16
+display_name = "Last Rite"
+description = "Раз за забег переживает смертельный удар: 1 HP, 2 секунды неуязвимости и волна, стирающая пули."
+quality = 4
+pool = "citadel"
+perks = Array[int]([7])

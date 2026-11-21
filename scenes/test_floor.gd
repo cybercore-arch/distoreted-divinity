@@ -1,12 +1,12 @@
 extends Node2D
-## Тестовый этаж 0.0: хаб в центре, вниз — комнаты с оружием, вверх — комнаты с врагами.
+## Тестовый этаж 0.0: хаб в центре, вниз — комнаты с оружием, вверх — комнаты с врагами, вправо — с артефактами.
 ## Этаж владеет игроком и HUD, создаёт текущую комнату и переключает комнаты по дверям.
 ## Дебаг: F — заполнить шкалу альта, C — убрать врагов (следом придёт новая волна).
 
 const DEFAULT_WEAPON_PATH := "res://data/weapons/holy_spear.tres"
 
 var _floor: FloorData
-var _index: int = 0
+var _cell: Vector2i = Vector2i.ZERO
 var _room: Room
 var _player: Player
 var _switching: bool = false
@@ -20,7 +20,7 @@ func _ready() -> void:
 	_player.weapons.append(load(DEFAULT_WEAPON_PATH) as WeaponData)
 	add_child(_player)
 
-	_enter_room(_floor.hub_index, -1)
+	_enter_room(_floor.start, -1)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -42,24 +42,23 @@ func _on_door_used(direction: Door.Direction) -> void:
 
 
 func _switch_room(direction: Door.Direction) -> void:
-	var step := 1 if direction == Door.Direction.UP else -1
-	var target := _index + step
-	if target >= 0 and target < _floor.rooms.size():
+	var target := _cell + Door.offset(direction)
+	if _floor.has_room(target):
 		_enter_room(target, direction)
 	_switching = false
 
 
 ## moved — в какую сторону игрок прошёл через дверь (Door.Direction) или -1 на старте.
-func _enter_room(index: int, moved: int) -> void:
-	_index = index
+func _enter_room(cell: Vector2i, moved: int) -> void:
+	_cell = cell
 	_clear_transients()
 	if _room != null:
 		remove_child(_room)
 		_room.queue_free()
 
-	var data := _floor.rooms[index]
+	var data := _floor.room_at(cell)
 	_room = Room.new()
-	_room.setup(data, _floor.title_above(index), _floor.title_below(index), _player)
+	_room.setup(data, _floor.neighbor_titles(cell), _player)
 	_room.door_used.connect(_on_door_used)
 	add_child(_room)
 	move_child(_room, 0)  # комната рисуется под игроком

@@ -38,6 +38,13 @@ func weapons() -> Array[WeaponData]:
 	return result
 
 
+func artifacts() -> Array[ArtifactData]:
+	var result: Array[ArtifactData] = []
+	for entry in _entries["a"]:
+		result.append(entry["resource"] as ArtifactData)
+	return result
+
+
 func enemies() -> Array[EnemyData]:
 	var result: Array[EnemyData] = []
 	for entry in _entries["e"]:
